@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Từ Ghép Y Khoa (EN-VI)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .quiz-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz Từ Ghép Y Khoa (Anh - Việt)</h1>
+    <form id="quiz-form"></form>
+    <button onclick="submitQuiz()">Nộp bài</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const quizData = [];
+
+    async function loadQuizData() {
+      const res = await fetch("https://raw.githubusercontent.com/HoangLong98/quizdata/main/medical_combine_quiz.json");
+      const data = await res.json();
+      for (let i = 0; i < 100; i++) {
+        const q = data[i];
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `<p><strong>Câu ${i + 1}:</strong> ${q.question}</p>`;
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.className = "options";
+        q.options.forEach((opt, j) => {
+          optionsDiv.innerHTML += `
+            <label>
+              <input type="radio" name="q${i}" value="${opt}"> ${String.fromCharCode(65 + j)}. ${opt}
+            </label>
+          `;
+        });
+
+        questionDiv.appendChild(optionsDiv);
+        document.getElementById("quiz-form").appendChild(questionDiv);
+        quizData.push(q);
+      }
+    }
+
+    function submitQuiz() {
+      let correct = 0;
+      quizData.forEach((q, i) => {
+        const options = document.getElementsByName(`q${i}`);
+        for (const opt of options) {
+          if (opt.checked && opt.value === q.answer) {
+            correct++;
+            break;
+          }
+        }
+      });
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerText = `Bạn trả lời đúng ${correct}/100 câu.`;
+    }
+
+    loadQuizData();
+  </script>
+</body>
+</html>
